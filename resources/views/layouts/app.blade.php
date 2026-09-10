@@ -59,6 +59,151 @@
                             <span>New Ticket</span>
                         </a>
 
+                        <!-- Notification Bell Dropdown -->
+                        <div class="relative" 
+                             x-data="{ 
+                                 open: false, 
+                                 unreadCount: {{ auth()->check() ? auth()->user()->unreadInAppNotifications()->count() : 0 }},
+                                 notifications: [],
+                                 loading: false,
+                                 init() {
+                                     // Periodically refresh unread count every 30 seconds
+                                     setInterval(() => {
+                                         fetch('{{ route('notifications.unread-count') }}')
+                                             .then(res => res.json())
+                                             .then(data => { this.unreadCount = data.unread_count; })
+                                             .catch(() => {});
+                                     }, 30000);
+                                 },
+                                 loadNotifications() {
+                                     this.loading = true;
+                                     fetch('{{ route('notifications.recent') }}')
+                                         .then(res => res.json())
+                                         .then(data => {
+                                             this.unreadCount = data.unread_count;
+                                             this.notifications = data.notifications;
+                                             this.loading = false;
+                                         })
+                                         .catch(() => { this.loading = false; });
+                                 },
+                                 toggle() {
+                                     this.open = !this.open;
+                                     if (this.open) {
+                                         this.loadNotifications();
+                                     }
+                                 },
+                                 markAllRead() {
+                                     fetch('{{ route('notifications.mark-all-read') }}', {
+                                         method: 'POST',
+                                         headers: {
+                                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                             'Accept': 'application/json'
+                                         }
+                                     }).then(() => {
+                                         this.unreadCount = 0;
+                                         this.notifications.forEach(n => n.read = true);
+                                     });
+                                 }
+                             }" 
+                             @click.outside="open = false">
+                            <button @click="toggle()" 
+                                    type="button"
+                                    class="relative p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition focus:outline-none"
+                                    title="Notifications">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                </svg>
+                                <template x-if="unreadCount > 0">
+                                    <span class="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-bold text-white ring-2 ring-white"
+                                          x-text="unreadCount > 99 ? '99+' : unreadCount"></span>
+                                </template>
+                            </button>
+
+                            <!-- Dropdown Window -->
+                            <div x-show="open" 
+                                 x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="transform opacity-0 scale-95"
+                                 x-transition:enter-end="transform opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="transform opacity-100 scale-100"
+                                 x-transition:leave-end="transform opacity-0 scale-95"
+                                 class="absolute right-0 mt-2 w-80 sm:w-96 rounded-xl bg-white shadow-xl ring-1 ring-black/5 z-50 divide-y divide-slate-100 overflow-hidden"
+                                 style="display: none;">
+                                
+                                <div class="px-4 py-3 flex items-center justify-between bg-slate-50/70">
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="text-sm font-semibold text-slate-800">Notifications</h3>
+                                        <template x-if="unreadCount > 0">
+                                            <span class="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-blue-100 text-blue-700" x-text="unreadCount + ' new'"></span>
+                                        </template>
+                                    </div>
+                                    <template x-if="unreadCount > 0">
+                                        <button @click="markAllRead()" 
+                                                class="text-xs text-blue-600 hover:text-blue-800 font-medium hover:underline">
+                                            Mark all read
+                                        </button>
+                                    </template>
+                                </div>
+
+                                <div class="max-h-80 overflow-y-auto divide-y divide-slate-100">
+                                    <!-- Loading State -->
+                                    <template x-if="loading">
+                                        <div class="p-6 text-center text-slate-400 text-xs flex items-center justify-center gap-2">
+                                            <svg class="animate-spin h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            Loading updates...
+                                        </div>
+                                    </template>
+
+                                    <!-- Notifications List -->
+                                    <template x-if="!loading && notifications.length > 0">
+                                        <div>
+                                            <template x-for="item in notifications" :key="item.id">
+                                                <a :href="item.url" 
+                                                   class="block px-4 py-3 hover:bg-slate-50 transition"
+                                                   :class="!item.read ? 'bg-blue-50/30' : ''">
+                                                    <div class="flex items-start gap-3">
+                                                        <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                                                             :class="item.icon_class">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                                            </svg>
+                                                        </div>
+                                                        <div class="flex-1 min-w-0">
+                                                            <div class="flex items-center justify-between gap-1">
+                                                                <p class="text-xs font-semibold text-slate-800 truncate" x-text="item.title"></p>
+                                                                <span class="text-[10px] text-slate-600 shrink-0" x-text="item.created_at"></span>
+                                                            </div>
+                                                            <p class="text-[11px] text-slate-600 mt-0.5 line-clamp-2 leading-relaxed" x-text="item.message"></p>
+                                                        </div>
+                                                        <template x-if="!item.read">
+                                                            <span class="w-2 h-2 rounded-full bg-blue-600 shrink-0 mt-1"></span>
+                                                        </template>
+                                                    </div>
+                                                </a>
+                                            </template>
+                                        </div>
+                                    </template>
+
+                                    <!-- Empty State -->
+                                    <template x-if="!loading && notifications.length === 0">
+                                        <div class="p-8 text-center">
+                                            <p class="text-xs text-slate-500">No recent notifications</p>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <div class="p-2.5 bg-slate-50/70 text-center">
+                                    <a href="{{ route('notifications.index') }}" 
+                                       class="text-xs font-medium text-blue-600 hover:text-blue-800 hover:underline block">
+                                        View all notifications &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- User Profile Dropdown -->
                         <div class="relative ml-2" x-data="{ open: false }" @click.outside="open = false">
                             <button @click="open = !open" 
