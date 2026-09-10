@@ -7,106 +7,103 @@
 [![Alpine.js](https://img.shields.io/badge/Alpine.js-3.x-8BC0D0?style=for-the-badge&logo=alpinedotjs&logoColor=white)](https://alpinejs.dev)
 [![Tests](https://img.shields.io/badge/Tests-Passing-success?style=for-the-badge&logo=checkmarx&logoColor=white)]()
 
-Aplikasi manajemen tiket dan layanan bantuan internal (**Internal Helpdesk & Ticketing System**) modern berbasis web yang dibangun menggunakan **Laravel**, **Tailwind CSS**, dan **Alpine.js**.
+A modern, responsive, web-based **Internal Helpdesk & Ticketing System** built with **Laravel**, **Tailwind CSS**, and **Alpine.js**.
 
-Sistem ini dirancang untuk menggantikan penanganan permintaan dukungan informal (melalui pesan instan/chat pribadi) menjadi alur kerja yang terpusat, transparan, terukur, dan memiliki riwayat audit lengkap antar departemen (*IT Support, General Affairs, Human Resources, Finance, Facility Management*).
-
----
-
-## 📑 Daftar Isi
-
-- [Fitur Utama](#-fitur-utama)
-- [Peran Pengguna & Hak Akses](#-peran-pengguna--hak-akses)
-- [Kebutuhan Sistem](#-kebutuhan-sistem)
-- [Panduan Instalasi (Quick Start)](#-panduan-instalasi-quick-start)
-- [Akun Demo Bawaan](#-akun-demo-bawaan-seeder)
-- [Struktur Alur Tiket & SLA](#-struktur-alur-tiket--sla)
-- [Struktur Direktori Proyek](#-struktur-direktori-proyek)
-- [Pengujian Otomatis (Testing)](#-pengujian-otomatis-testing)
-- [Lisensi](#-lisensi)
+This platform replaces unstructured support requests (such as instant messages, spreadsheets, or direct emails) with a centralized, auditable, and transparent service management workflow across multiple corporate departments (*IT Support, General Affairs, Human Resources, Finance, Facility Management*).
 
 ---
 
-## ✨ Fitur Utama
+## 📑 Table of Contents
 
-- **Siklus Hidup Tiket Lengkap (Lifecycle)**:
-  - Status tiket dinamis: `Open`, `In Progress`, `Pending`, `Resolved`, `Closed`.
-  - Tingkat prioritas: `Low`, `Medium`, `High`, `Urgent`.
-  - Format kode tiket unik otomatis (Contoh: `HD-2026-000101`).
-- **SLA Tracking & Peringatan Otomatis**:
-  - Batas waktu respon pertama (*First Response Target*) & batas waktu penyelesaian (*Resolution Target*).
-  - Indikator status visual: `Safe` (Aman), `Near Deadline` (Mendekati Batas), dan `Overdue` (Terlambat).
-- **Diskusi Interaktif & Internal Notes**:
-  - Balasan publik (*Public Reply*) antara pemohon (*Requester*) dan staf penanganan (*Agent*).
-  - Catatan internal rahasia (*Staff-only Private Notes*) untuk koordinasi tim teknis tanpa terlihat oleh pemohon.
-- **Log Aktivitas & Audit Trail**:
-  - Rekam jejak kronologis setiap perubahan status, pengalihan penanggung jawab, perubahan prioritas, dan resolusi tiket.
-- **Manajemen Lampiran (File Attachments)**:
-  - Unggah tangkapan layar (screenshot), dokumen, PDF dengan verifikasi tipe file dan ukuran.
-  - Proteksi unduhan lampiran internal khusus staf.
-- **Dashboard Khusus Sesuai Peran**:
-  - **Admin**: Ringkasan performa global, rasio penyelesaian, monitoring SLA, dan aktivitas sistem.
-  - **Agent**: Antrean tugas pribadi (*Assigned to Me*), tiket belum dialokasikan (*Unassigned*), dan tiket prioritas tinggi.
-  - **User**: Daftar tiket yang diajukan, status penanganan terkini, dan riwayat penyelesaian.
-- **Laporan & Ekspor Data (Reporting)**:
-  - Filter laporan berdasarkan rentang tanggal, departemen, kategori, status, dan prioritas.
-  - Ekspor instan ke format **CSV** untuk kebutuhan analisis & audit berkala.
-- **Manajemen Master Data (Admin Panel)**:
-  - Manajemen Pengguna & Peran (*User Management*).
-  - Manajemen Departemen & Kategori Permintaan (*Multi-department support*).
-  - Konfigurasi Target Waktu SLA per tingkat prioritas.
+- [Key Features](#-key-features)
+- [User Roles & Access Control](#-user-roles--access-control)
+- [System Requirements](#-system-requirements)
+- [Quick Start Installation](#-quick-start-installation)
+- [Pre-configured Demo Accounts](#-pre-configured-demo-accounts)
+- [Ticket Lifecycle & SLA Matrix](#-ticket-lifecycle--sla-matrix)
+- [Project Architecture](#-project-architecture)
+- [Automated Testing](#-automated-testing)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ---
 
-## 👥 Peran Pengguna & Hak Akses
+## ✨ Key Features
 
-| Peran | Deskripsi Hak Akses |
+- **Comprehensive Ticket Lifecycle**:
+  - Dynamic statuses: `Open`, `In Progress`, `Pending`, `Resolved`, and `Closed`.
+  - Priority levels: `Low`, `Medium`, `High`, and `Urgent`.
+  - Automatic standardized ticket code generator (e.g., `HD-2026-000101`).
+- **Automated SLA Tracking & Indicators**:
+  - Configurable SLA thresholds for both **First Response Target** and **Resolution Target**.
+  - Real-time visual status badges: `Safe`, `Near Deadline`, and `Overdue`.
+- **Collaborative Messaging & Private Notes**:
+  - **Public Replies**: Seamless conversation between requester and assigned agents.
+  - **Confidential Internal Notes**: Staff-only discussion and internal diagnosis hidden from requesters.
+- **Audit Trail & Activity Logging**:
+  - Chronological history tracking assignments, status updates, priority adjustments, and resolutions.
+- **Secure File Attachments**:
+  - Support for screenshots, error logs, and PDF documentation with MIME validation and secure access control.
+- **Role-Tailored Dashboards**:
+  - **Admin**: Global analytics, department volume, SLA compliance, and system activity.
+  - **Agent**: Personal task queue (*Assigned to Me*), unassigned tickets, and near-deadline warnings.
+  - **User**: Real-time status overview of submitted requests and recent resolution updates.
+- **Reporting & Data Export**:
+  - Comprehensive filters by date range, department, category, status, and priority.
+  - One-click **CSV export** for audits, metrics analysis, and KPI reporting.
+- **Master Data Administration**:
+  - Full CRUD control for Users, Roles, Departments, Categories, and SLA response/resolution hours.
+
+---
+
+## 👥 User Roles & Access Control
+
+| Role | Permissions & Responsibilities |
 |---|---|
-| **Administrator** | Akses penuh ke seluruh sistem, manajemen master pengguna, departemen, kategori, pengaturan SLA, dan semua tiket. |
-| **Supervisor** | Memantau seluruh tiket dalam departemennya, menugaskan tiket ke Agent, mengubah prioritas, dan memonitor kepatuhan SLA. |
-| **Agent / Staff** | Menangani tiket yang ditugaskan kepadanya, memperbarui status, menulis balasan publik & catatan internal rahasia, serta menyelesaikan masalah (*Resolve*). |
-| **User / Requester** | Mengajukan tiket baru, memantau kemajuan penanganan tiket miliknya, membalas respon staf, dan mengunduh lampiran publik. |
+| **Administrator** | Full system governance, user management, department/category setups, SLA settings, and visibility into all tickets. |
+| **Supervisor** | Departmental oversight, assigning tickets to agents, modifying priority levels, and monitoring SLA compliance. |
+| **Agent / Support Staff** | Handling assigned tickets, posting public replies & internal notes, updating statuses, and resolving issues. |
+| **User / Requester** | Submitting new support tickets, monitoring ticket progress, communicating with agents, and downloading public attachments. |
 
 ---
 
-## 💻 Kebutuhan Sistem
+## 💻 System Requirements
 
-Pastikan lingkungan kerja / server lokal Anda telah terpasang:
+Before running the application, ensure the following tools are installed on your system:
 
-- **PHP** >= 8.3 (dengan ekstensi: `pdo`, `sqlite3` atau `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `curl`)
+- **PHP** >= 8.3 (Required extensions: `pdo`, `sqlite3` or `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `curl`)
 - **Composer** >= 2.x
 - **Node.js** >= 18.x & **NPM** >= 9.x
-- **Basis Data**: SQLite (default & siap pakai), MySQL 8.0+, atau MariaDB 10.4+
-- Web server opsional: Laragon, XAMPP, Nginx, atau bawaan Laravel Artisan Server
+- **Database**: SQLite (default, zero configuration required) or MySQL 8.0+ / MariaDB 10.4+ / PostgreSQL
 
 ---
 
-## 🚀 Panduan Instalasi (Quick Start)
+## 🚀 Quick Start Installation
 
-Ikuti langkah-langkah berikut untuk meng-clone dan menjalankan proyek ini di mesin lokal:
+Follow these steps to clone, configure, and run the project locally:
 
-### 1. Clone Repository
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/tubaguskencana/helpdesk.git
 cd helpdesk
 ```
 
-### 2. Pasang Dependensi PHP (Composer)
+### 2. Install PHP Dependencies
 
 ```bash
 composer install
 ```
 
-### 3. Pasang Dependensi Frontend (NPM)
+### 3. Install Frontend Dependencies
 
 ```bash
 npm install
 ```
 
-### 4. Konfigurasi Environment (`.env`)
+### 4. Setup Environment Configuration
 
-Salin file contoh konfigurasi environment:
+Copy the example environment configuration:
 
 ```bash
 # Windows PowerShell / Command Prompt
@@ -116,19 +113,19 @@ copy .env.example .env
 cp .env.example .env
 ```
 
-Generate application encryption key:
+Generate the unique application encryption key:
 
 ```bash
 php artisan key:generate
 ```
 
-### 5. Pengaturan Database & Migrasi
+### 5. Database Setup & Seeding
 
-Aplikasi ini menggunakan **SQLite** secara bawaan sehingga Anda tidak wajib menginstal MySQL terlebih dahulu.
+The application comes pre-configured with **SQLite** for instant setup without requiring an external database server.
 
-#### Opsi A: Menggunakan SQLite (Rekomendasi Cepat)
+#### Option A: Using SQLite (Recommended for Local Dev)
 
-Pastikan file database sqlite tersedia (jika belum ada):
+Ensure the SQLite database file exists:
 
 ```bash
 # Windows PowerShell
@@ -138,15 +135,15 @@ if (-not (Test-Path database/database.sqlite)) { New-Item database/database.sqli
 touch database/database.sqlite
 ```
 
-Jalankan migrasi database sekaligus seeder data demo:
+Run database migrations along with the pre-populated demo seeders:
 
 ```bash
 php artisan migrate --seed
 ```
 
-#### Opsi B: Menggunakan MySQL / MariaDB
+#### Option B: Using MySQL / MariaDB
 
-1. Buka file `.env` dan sesuaikan koneksi database:
+1. Adjust your `.env` file with your database credentials:
    ```env
    DB_CONNECTION=mysql
    DB_HOST=127.0.0.1
@@ -155,78 +152,78 @@ php artisan migrate --seed
    DB_USERNAME=root
    DB_PASSWORD=
    ```
-2. Buat database baru di MySQL dengan nama `helpdesk_system`.
-3. Jalankan migrasi dan seeder:
+2. Create the `helpdesk_system` database in MySQL.
+3. Execute migrations and seeders:
    ```bash
    php artisan migrate --seed
    ```
 
-### 6. Buat Symlink Storage
+### 6. Create Storage Symlink
 
-Perintah ini diperlukan agar file lampiran yang diunggah dapat diakses dengan baik:
+Required to make uploaded ticket attachments securely downloadable:
 
 ```bash
 php artisan storage:link
 ```
 
-### 7. Kompilasi Aset Frontend
+### 7. Compile Assets
 
-Jalankan Vite build untuk mode produksi atau development:
+Build the frontend assets using Vite:
 
 ```bash
-# Untuk kompilasi aset siap pakai
+# Compile optimized production bundle
 npm run build
 
-# Atau untuk mode hot-reload selama pengembangan
+# Or launch hot-reloading development server
 npm run dev
 ```
 
-### 8. Jalankan Server Lokal
+### 8. Start Local Development Server
 
-Buka terminal baru dan jalankan:
+Run the Laravel Artisan server:
 
 ```bash
 php artisan serve
 ```
 
-Aplikasi dapat diakses melalui peramban web di:
+Access the application in your browser at:
 👉 **[http://localhost:8000](http://localhost:8000)**
 
 ---
 
-## 🔐 Akun Demo Bawaan (Seeder)
+## 🔐 Pre-configured Demo Accounts
 
-Setelah menjalankan `php artisan migrate --seed`, Anda dapat langsung login menggunakan salah satu akun demonstrasi berikut:
+Once you run `php artisan migrate --seed`, you can log in immediately using any of these seeded accounts:
 
-> **Password untuk semua akun:** `password`
+> **Default password for all accounts:** `password`
 
-| Peran | Nama | Email | Departemen | Keterangan |
+| Role | Name | Email | Department | Purpose / Scope |
 |---|---|---|---|---|
-| **Admin** | Administrator System | `admin@helpdesk.test` | System / IT | Akses semua modul & pengaturan |
-| **Supervisor** | Alex Pratama | `supervisor@helpdesk.test` | IT Support | Pengawas tim & assignment tiket |
-| **Agent IT** | Budi Santoso | `agent.it@helpdesk.test` | IT Support | Staf teknis IT & penanganan tiket |
-| **Agent IT** | Citra Lestari | `citra.it@helpdesk.test` | IT Support | Staf spesialis jaringan & sistem |
-| **Agent GA** | Doni Wijaya | `agent.ga@helpdesk.test` | General Affairs | Penanganan fasilitas & logistik kantor |
-| **User (Finance)** | Sarah Jenkins | `user@helpdesk.test` | Finance & Accounting | Pemohon tiket (Finance Analyst) |
-| **User (HR)** | Kevin Hartanto | `kevin@helpdesk.test` | Human Resources | Pemohon tiket (HR Ops) |
-| **User (Finance)** | Maya Putri | `maya@helpdesk.test` | Finance & Accounting | Pemohon tiket (AP Lead) |
+| **Admin** | Administrator System | `admin@helpdesk.test` | System / IT | Full administrative control |
+| **Supervisor** | Alex Pratama | `supervisor@helpdesk.test` | IT Support | Team management & ticket dispatch |
+| **Agent IT** | Budi Santoso | `agent.it@helpdesk.test` | IT Support | Senior support technician |
+| **Agent IT** | Citra Lestari | `citra.it@helpdesk.test` | IT Support | Network & systems specialist |
+| **Agent GA** | Doni Wijaya | `agent.ga@helpdesk.test` | General Affairs | Facilities & logistics coordinator |
+| **User (Finance)** | Sarah Jenkins | `user@helpdesk.test` | Finance & Accounting | Requester (Financial Analyst) |
+| **User (HR)** | Kevin Hartanto | `kevin@helpdesk.test` | Human Resources | Requester (People Operations) |
+| **User (Finance)** | Maya Putri | `maya@helpdesk.test` | Finance & Accounting | Requester (Accounts Payable) |
 
 ---
 
-## 🔄 Struktur Alur Tiket & SLA
+## 🔄 Ticket Lifecycle & SLA Matrix
 
-### Alur Kerja Penanganan Tiket:
+### Ticket Workflow Overview:
 
 ```text
-[User / Requester]
-       │  (1. Membuat Tiket Baru)
+[Requester / User]
+       │  (1. Submit New Ticket)
        ▼
  [Status: Open]
        │
        ├───────────────────────────────────────────────┐
        ▼                                               ▼
-[Supervisor / Admin]                           [Agent Menangani]
- (2. Menugaskan Tiket)                         (3. Mengubah Status)
+[Supervisor / Admin]                           [Agent Pick Up]
+ (2. Assign to Agent)                          (3. Update Status)
        │                                               │
        └───────────────────────┬───────────────────────┘
                                ▼
@@ -234,8 +231,8 @@ Setelah menjalankan `php artisan migrate --seed`, Anda dapat langsung login meng
                                │
                  ┌─────────────┴─────────────┐
                  ▼                           ▼
-          [Balasan Publik]           [Internal Notes]
-          (Dilihat Pemohon)         (Hanya Dilihat Staf)
+          [Public Reply]              [Internal Notes]
+       (Visible to Requester)       (Staff-Only Visibility)
                  │                           │
                  └─────────────┬─────────────┘
                                ▼
@@ -245,79 +242,77 @@ Setelah menjalankan `php artisan migrate --seed`, Anda dapat langsung login meng
                      [Status: Closed]
 ```
 
-### Konfigurasi Standar SLA:
+### Default SLA Targets:
 
-| Prioritas | Target Respon Pertama | Target Penyelesaian |
+| Priority | First Response Target | Resolution Target |
 |---|---|---|
-| **Urgent** | 1 Jam | 8 Jam |
-| **High** | 4 Jam | 24 Jam |
-| **Medium** | 8 Jam | 48 Jam |
-| **Low** | 24 Jam | 72 Jam |
+| **Urgent** | 1 Hour | 8 Hours |
+| **High** | 4 Hours | 24 Hours |
+| **Medium** | 8 Hours | 48 Hours |
+| **Low** | 24 Hours | 72 Hours |
 
 ---
 
-## 📁 Struktur Direktori Proyek
+## 📁 Project Architecture
 
 ```text
 helpdesk-system/
 ├── app/
 │   ├── Http/
 │   │   ├── Controllers/
-│   │   │   ├── Admin/               # Master User, Department, Category, SLA Controller
-│   │   │   ├── AuthController.php   # Login, Logout, Profile Management
+│   │   │   ├── Admin/               # User, Department, Category, SLA Controllers
+│   │   │   ├── AuthController.php   # Login, Session, Profile Management
 │   │   │   ├── DashboardController.php
-│   │   │   ├── ReportController.php # Laporan performa & ekspor CSV
-│   │   │   ├── TicketController.php # Manajemen tiket & status
+│   │   │   ├── ReportController.php # Performance analytics & CSV exports
+│   │   │   ├── TicketController.php # Ticket lifecycle and assignments
 │   │   │   └── TicketReplyController.php
 │   │   └── Middleware/
-│   │       ├── EnsureAdmin.php      # Proteksi route Admin
-│   │       └── EnsureStaff.php      # Proteksi route Agent/Supervisor/Admin
-│   ├── Models/                      # Model Eloquent (Ticket, User, SlaSetting, dll)
-│   ├── Policies/                    # Laravel Authorization Policy
+│   │       ├── EnsureAdmin.php      # Administrator route guard
+│   │       └── EnsureStaff.php      # Staff (Agent/Supervisor/Admin) route guard
+│   ├── Models/                      # Eloquent models (Ticket, User, SlaSetting, etc.)
+│   ├── Policies/                    # Authorization policies (TicketPolicy)
 │   └── Services/
-│       └── TicketService.php        # Business logic kalkulasi SLA & status
+│       └── TicketService.php        # Business logic for SLA tracking & state transitions
 ├── database/
-│   ├── migrations/                  # Skema database relasional
-│   └── seeders/                     # Seeder data master & tiket simulasi
+│   ├── migrations/                  # Relational database schemas
+│   └── seeders/                     # Master data and sample ticket seeders
 ├── resources/
-│   ├── css/app.css                  # Konfigurasi Tailwind CSS
-│   ├── js/app.js                    # Alpine.js setup
-│   └── views/                       # Blade templates & layouts
+│   ├── css/app.css                  # Tailwind CSS configuration
+│   ├── js/app.js                    # Alpine.js initialization
+│   └── views/                       # Blade components and view layouts
 ├── routes/
-│   └── web.php                      # Definisi rute aplikasi
+│   └── web.php                      # Application routing definitions
 └── tests/
     └── Feature/
-        └── HelpdeskSystemTest.php   # Unit & Feature automated tests
+        └── HelpdeskSystemTest.php   # Automated feature and integration tests
 ```
 
 ---
 
-## 🧪 Pengujian Otomatis (Testing)
+## 🧪 Automated Testing
 
-Proyek ini telah dilengkapi dengan rangkaian automated test menggunakan **PHPUnit** untuk memverifikasi alur otentikasi, perizinan role, pembuatan tiket, dan proteksi catatan rahasia:
+The project includes an end-to-end suite of automated tests using **PHPUnit** verifying authentication, RBAC authorization, ticket creation, SLA calculations, and internal notes confidentiality:
 
 ```bash
+# Run all test suites
 php artisan test
-```
 
-Untuk menjalankan tes tertentu:
-
-```bash
+# Run the core helpdesk feature tests
 php artisan test --filter=HelpdeskSystemTest
 ```
 
 ---
 
-## 🤝 Kontribusi & Pengembangan
+## 🤝 Contributing
 
-1. Fork repository ini
-2. Buat branch fitur baru (`git checkout -b feature/fitur-keren`)
-3. Lakukan commit perubahan Anda (`git commit -m 'Menambahkan fitur keren'`)
-4. Push ke branch Anda (`git push origin feature/fitur-keren`)
-5. Buat **Pull Request**
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to your branch (`git push origin feature/amazing-feature`)
+5. Open a **Pull Request**
 
 ---
 
-## 📄 Lisensi
+## 📄 License
 
-Proyek ini dilisensikan di bawah lisensi terbuka [MIT License](LICENSE).
+This project is open-sourced under the [MIT License](LICENSE).
