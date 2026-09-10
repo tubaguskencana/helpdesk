@@ -369,11 +369,19 @@
                             </a>
 
                             <a href="{{ route('admin.sla.index') }}" 
-                               class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition {{ request()->routeIs('admin.sla.*') ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-700 hover:bg-slate-100' }}">
+                                class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition {{ request()->routeIs('admin.sla.*') ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-700 hover:bg-slate-100' }}">
                                 <svg class="w-5 h-5 {{ request()->routeIs('admin.sla.*') ? 'text-blue-600' : 'text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                                 <span>SLA Settings</span>
+                            </a>
+
+                            <a href="{{ route('admin.notifications.whatsapp.index') }}" 
+                                class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition {{ request()->routeIs('admin.notifications.whatsapp.*') ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-700 hover:bg-slate-100' }}">
+                                <svg class="w-5 h-5 {{ request()->routeIs('admin.notifications.whatsapp.*') ? 'text-emerald-600' : 'text-slate-500' }}" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.075-2.07-.497-1.748-.727-2.859-2.518-2.946-2.634-.087-.116-.708-.941-.708-1.793s.448-1.272.607-1.446c.159-.175.347-.217.463-.217l.332.007c.101.005.246-.038.376.275.145.348.492 1.201.535 1.289.043.087.072.189.014.305-.058.116-.087.188-.173.289l-.26.304c-.087.087-.174.188-.073.362.101.174.449.74 1.006 1.236.719.641 1.325.84 1.513.927.188.087.289.072.391-.043.101-.116.435-.508.55-.682.116-.174.232-.145.39-.087.159.058 1.013.478 1.186.565.174.087.289.13.332.203.043.072.043.42-.101.825z"/>
+                                </svg>
+                                <span>WhatsApp Integration</span>
                             </a>
                         </div>
                     </div>

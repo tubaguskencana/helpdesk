@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\SlaSettingController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\WhatsAppController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
@@ -105,6 +106,16 @@ Route::middleware('auth')->group(function () {
         Route::prefix('sla')->name('sla.')->group(function () {
             Route::get('/', [SlaSettingController::class, 'index'])->name('index');
             Route::put('/', [SlaSettingController::class, 'update'])->name('update');
+        });
+
+        // WhatsApp & Notification Integration
+        Route::prefix('notifications/whatsapp')->name('notifications.whatsapp.')->group(function () {
+            Route::get('/', [WhatsAppController::class, 'index'])->name('index');
+            Route::get('/status', [WhatsAppController::class, 'status'])->name('status');
+            Route::post('/connect', [WhatsAppController::class, 'connect'])->name('connect');
+            Route::post('/disconnect', [WhatsAppController::class, 'disconnect'])->name('disconnect');
+            Route::post('/test', [WhatsAppController::class, 'testMessage'])->name('test');
+            Route::post('/toggle', [WhatsAppController::class, 'toggleSetting'])->name('toggle');
         });
     });
 });
