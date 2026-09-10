@@ -34,3 +34,10 @@ README.md - Helpdesk & Ticketing System.md
 *implementation_plan*
 *implementation-plan*
 *Implementation Plan*
+
+# WhatsApp Service (gwa-api)
+/gwa-api/node_modules
+/gwa-api/baileys_auth_info
+/gwa-api/*.log
+/gwa-api/build/.env
+

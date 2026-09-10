@@ -189,6 +189,20 @@ php artisan serve
 Access the application in your browser at:
 👉 **[http://localhost:8000](http://localhost:8000)**
 
+### 9. (Optional) Start WhatsApp Gateway Daemon (`gwa-api`)
+
+For real-time WhatsApp ticket notifications, start the included Baileys WhatsApp service:
+
+```bash
+# In a separate terminal
+cd gwa-api
+npm install
+npm start
+```
+
+1. The gateway listens on `http://localhost:3000`.
+2. Open the Helpdesk admin panel at **Admin -> WhatsApp Integration** (`/admin/notifications/whatsapp`) to scan the QR code and link your WhatsApp number.
+
 ---
 
 ## 🔐 Pre-configured Demo Accounts
