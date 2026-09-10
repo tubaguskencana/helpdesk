@@ -15,9 +15,13 @@ use Illuminate\Support\Facades\Storage;
 
 class TicketService
 {
+    public function __construct(
+        protected NotificationService $notificationService
+    ) {}
+
     public function createTicket(User $user, array $data, array $attachments = []): Ticket
     {
-        return DB::transaction(function () use ($user, $data, $attachments) {
+        $ticket = DB::transaction(function () use ($user, $data, $attachments) {
             $year = Carbon::now()->format('Y');
 
             // Generate next ticket number: HD-YYYY-XXXXXX
@@ -67,11 +71,15 @@ class TicketService
 
             return $ticket;
         });
+
+        $this->notificationService->notifyTicketCreated($ticket);
+
+        return $ticket;
     }
 
     public function addReply(Ticket $ticket, User $user, string $message, bool $isInternal = false, array $attachments = []): TicketReply
     {
-        return DB::transaction(function () use ($ticket, $user, $message, $isInternal, $attachments) {
+        $reply = DB::transaction(function () use ($ticket, $user, $message, $isInternal, $attachments) {
             $reply = TicketReply::create([
                 'ticket_id' => $ticket->id,
                 'user_id' => $user->id,
@@ -106,6 +114,10 @@ class TicketService
 
             return $reply;
         });
+
+        $this->notificationService->notifyReplyAdded($ticket, $reply, $user);
+
+        return $reply;
     }
 
     public function updateStatus(Ticket $ticket, User $actor, string $newStatus): Ticket
@@ -147,6 +159,8 @@ class TicketService
 
         $this->logActivity($ticket, $actor, $activityType, $desc, $oldStatus, $newStatus);
 
+        $this->notificationService->notifyStatusChanged($ticket, $oldStatus, $newStatus, $actor);
+
         return $ticket;
     }
 
@@ -173,6 +187,8 @@ class TicketService
             $oldPriority,
             $newPriority
         );
+
+        $this->notificationService->notifyPriorityChanged($ticket, $oldPriority, $newPriority, $actor);
 
         return $ticket;
     }
@@ -205,6 +221,8 @@ class TicketService
             $oldAgent?->name ?? 'Unassigned',
             $agent?->name ?? 'Unassigned'
         );
+
+        $this->notificationService->notifyTicketAssigned($ticket, $agent, $actor);
 
         return $ticket;
     }

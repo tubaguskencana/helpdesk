@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\Department;
+use App\Models\Notification;
+use App\Models\NotificationSetting;
 use App\Models\SlaSetting;
 use App\Models\Ticket;
 use App\Models\TicketActivity;
@@ -444,6 +446,55 @@ class DatabaseSeeder extends Seeder
             'sla_due_at' => $t6Opened->copy()->addHours(48),
             'created_at' => $t6Opened,
             'updated_at' => Carbon::now()->subDays(3),
+        ]);
+
+        // 6. Seed Notification Settings
+        $events = [
+            'ticket_created',
+            'ticket_assigned',
+            'reply_added',
+            'status_changed',
+            'priority_changed',
+        ];
+
+        foreach ($events as $event) {
+            NotificationSetting::create([
+                'event' => $event,
+                'web_enabled' => true,
+                'push_enabled' => true,
+                'whatsapp_enabled' => true,
+            ]);
+        }
+
+        // 7. Seed Sample In-App Notifications
+        Notification::create([
+            'user_id' => $agentIT1->id,
+            'type' => Notification::TYPE_TICKET_ASSIGNED,
+            'title' => 'New Ticket Assigned: #' . $t1->ticket_number,
+            'message' => "Ticket '{$t1->subject}' has been assigned to you by {$supervisor->name}.",
+            'url' => route('tickets.show', $t1),
+            'read_at' => null,
+            'created_at' => Carbon::now()->subMinutes(40),
+        ]);
+
+        Notification::create([
+            'user_id' => $userFinance->id,
+            'type' => Notification::TYPE_REPLY_ADDED,
+            'title' => 'Reply on #' . $t1->ticket_number,
+            'message' => "{$agentIT1->name} replied: \"Halo Bu Sarah, tiket sudah kami terima...\"",
+            'url' => route('tickets.show', $t1),
+            'read_at' => null,
+            'created_at' => Carbon::now()->subMinutes(25),
+        ]);
+
+        Notification::create([
+            'user_id' => $admin->id,
+            'type' => Notification::TYPE_STATUS_CHANGED,
+            'title' => 'Ticket Resolved: #' . $t3->ticket_number,
+            'message' => "Ticket '{$t3->subject}' marked as Resolved by {$agentIT2->name}.",
+            'url' => route('tickets.show', $t3),
+            'read_at' => null,
+            'created_at' => Carbon::now()->subHours(10),
         ]);
     }
 }
