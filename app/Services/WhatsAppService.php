@@ -28,7 +28,7 @@ class WhatsAppService
 
     public function isMockMode(): bool
     {
-        return config('services.whatsapp.mock', env('WHATSAPP_MOCK_MODE', true));
+        return (bool) config('services.whatsapp.mock', env('WHATSAPP_MOCK_MODE', false));
     }
 
     public function getServiceUrl(): string
@@ -60,36 +60,53 @@ class WhatsAppService
 
     public function getStatus(): array
     {
+        $serviceUrl = $this->getServiceUrl();
+
         if ($this->isMockMode()) {
             $session = $this->getSessionData();
-            $status = $session['status'] ?? self::STATUS_CONNECTED; // Default connected in mock mode for instant usability
-            
             return [
-                'status' => $status,
-                'account' => $session['account'] ?? '+62 811-0000-888',
-                'connected_since' => $session['connected_since'] ?? Carbon::now()->subDays(2)->format('d M Y, H:i'),
+                'status' => $session['status'] ?? self::STATUS_DISCONNECTED,
+                'account' => $session['account'] ?? null,
+                'connected_since' => $session['connected_since'] ?? null,
                 'error' => $session['error'] ?? null,
                 'qr_code' => $session['qr_code'] ?? null,
+                'is_mock' => true,
             ];
         }
 
         try {
-            $response = Http::timeout(5)
+            $response = Http::timeout(2)
                 ->withToken($this->getServiceToken())
-                ->get("{$this->getServiceUrl()}/status");
+                ->get("{$serviceUrl}/status");
 
             if ($response->successful()) {
-                return $response->json();
+                $data = $response->json();
+                return [
+                    'status' => $data['status'] ?? self::STATUS_DISCONNECTED,
+                    'account' => $data['account'] ?? null,
+                    'connected_since' => $data['connected_since'] ?? null,
+                    'error' => $data['error'] ?? null,
+                    'qr_code' => $data['qr_code'] ?? $data['qr'] ?? null,
+                    'is_mock' => false,
+                ];
             }
 
             return [
                 'status' => self::STATUS_ERROR,
-                'error' => 'WhatsApp Service responded with HTTP ' . $response->status(),
+                'account' => null,
+                'connected_since' => null,
+                'error' => "WhatsApp service di {$serviceUrl} merespons dengan HTTP status " . $response->status(),
+                'qr_code' => null,
+                'is_mock' => false,
             ];
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             return [
                 'status' => self::STATUS_DISCONNECTED,
-                'error' => 'Cannot reach WhatsApp service: ' . $e->getMessage(),
+                'account' => null,
+                'connected_since' => null,
+                'error' => "Server WhatsApp tidak aktif / tidak dapat dihubungi di {$serviceUrl}. Pastikan server WhatsApp (Node.js/Baileys) sudah dijalankan.",
+                'qr_code' => null,
+                'is_mock' => false,
             ];
         }
     }
@@ -102,15 +119,16 @@ class WhatsAppService
 
     public function connect(): array
     {
+        $serviceUrl = $this->getServiceUrl();
+
         if ($this->isMockMode()) {
-            // Generate a demo QR code data URL (SVG encoded)
             $qrSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="220" height="220"><rect width="100" height="100" fill="#ffffff"/><rect x="10" y="10" width="20" height="20" fill="#1e293b"/><rect x="70" y="10" width="20" height="20" fill="#1e293b"/><rect x="10" y="70" width="20" height="20" fill="#1e293b"/><rect x="40" y="40" width="20" height="20" fill="#22c55e"/><circle cx="50" cy="50" r="6" fill="#ffffff"/><rect x="40" y="15" width="10" height="10" fill="#1e293b"/><rect x="15" y="40" width="10" height="10" fill="#1e293b"/><rect x="70" y="70" width="15" height="15" fill="#1e293b"/><rect x="50" y="75" width="10" height="10" fill="#1e293b"/></svg>';
             $qrDataUri = 'data:image/svg+xml;utf8,' . rawurlencode($qrSvg);
 
             $session = [
-                'status' => self::STATUS_CONNECTED,
-                'account' => '+62 811-0000-888',
-                'connected_since' => Carbon::now()->format('d M Y, H:i'),
+                'status' => self::STATUS_QR_REQUIRED,
+                'account' => null,
+                'connected_since' => null,
                 'qr_code' => $qrDataUri,
                 'error' => null,
             ];
@@ -120,21 +138,30 @@ class WhatsAppService
         }
 
         try {
-            $response = Http::timeout(10)
+            $response = Http::timeout(5)
                 ->withToken($this->getServiceToken())
-                ->post("{$this->getServiceUrl()}/session/start");
+                ->post("{$serviceUrl}/session/start");
 
-            return $response->json() ?? ['status' => self::STATUS_CONNECTING];
-        } catch (\Throwable $e) {
+            if ($response->successful()) {
+                return $response->json();
+            }
+
             return [
                 'status' => self::STATUS_ERROR,
-                'error' => $e->getMessage(),
+                'error' => "Gagal memulai sesi WhatsApp: HTTP {$response->status()} - {$response->body()}",
+            ];
+        } catch (\Throwable) {
+            return [
+                'status' => self::STATUS_ERROR,
+                'error' => "Tidak dapat menghubungi server WhatsApp di {$serviceUrl}. Pastikan server WhatsApp (Node.js/Baileys) sudah dijalankan.",
             ];
         }
     }
 
     public function disconnect(): array
     {
+        $serviceUrl = $this->getServiceUrl();
+
         if ($this->isMockMode()) {
             $session = [
                 'status' => self::STATUS_DISCONNECTED,
@@ -151,13 +178,13 @@ class WhatsAppService
         try {
             $response = Http::timeout(5)
                 ->withToken($this->getServiceToken())
-                ->post("{$this->getServiceUrl()}/session/disconnect");
+                ->post("{$serviceUrl}/session/disconnect");
 
             return $response->json() ?? ['status' => self::STATUS_DISCONNECTED];
         } catch (\Throwable $e) {
             return [
                 'status' => self::STATUS_DISCONNECTED,
-                'error' => $e->getMessage(),
+                'error' => "Gagal menghubungi service: " . $e->getMessage(),
             ];
         }
     }

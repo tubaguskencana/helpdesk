@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'whatsapp' => [
+        'enabled' => env('WHATSAPP_ENABLED', true),
+        'url' => env('WHATSAPP_SERVICE_URL', 'http://localhost:3000'),
+        'token' => env('WHATSAPP_SERVICE_TOKEN', ''),
+        'mock' => env('WHATSAPP_MOCK_MODE', false),
+    ],
+
 ];

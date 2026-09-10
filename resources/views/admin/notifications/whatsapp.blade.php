@@ -8,6 +8,7 @@
          connectionStatus: '{{ $status['status'] }}',
          account: '{{ $status['account'] ?? '' }}',
          qrCode: '{{ $status['qr_code'] ?? '' }}',
+         errorMessage: '{{ addslashes($status['error'] ?? '') }}',
          loading: false,
          refreshStatus() {
              fetch('{{ route('admin.notifications.whatsapp.status') }}')
@@ -16,6 +17,7 @@
                      this.connectionStatus = data.status;
                      this.account = data.account || '';
                      this.qrCode = data.qr_code || '';
+                     this.errorMessage = data.error || '';
                  });
          }
      }">
@@ -26,7 +28,7 @@
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.075-2.07-.497-1.748-.727-2.859-2.518-2.946-2.634-.087-.116-.708-.941-.708-1.793s.448-1.272.607-1.446c.159-.175.347-.217.463-.217l.332.007c.101.005.246-.038.376.275.145.348.492 1.201.535 1.289.043.087.072.189.014.305-.058.116-.087.188-.173.289l-.26.304c-.087.087-.174.188-.073.362.101.174.449.74 1.006 1.236.719.641 1.325.84 1.513.927.188.087.289.072.391-.043.101-.116.435-.508.55-.682.116-.174.232-.145.39-.087.159.058 1.013.478 1.186.565.174.087.289.13.332.203.043.072.043.42-.101.825z"/>
+                        <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.075-2.07-.497-1.748-.727-2.859-2.518-2.946-2.634-.087-.116-.708-.941-.708-1.793s.448-1.272.607-1.446c.159-.175.347-.217.463-.217l.332.007c.101.005.246-.038.376.275.145.348.492 1.201.535 1.289.043.087.072.189.014.305-.058.116-.087.188-.173.289l-.26.304c-.087.087-.174.188-.073.362.101.174.449.74 1.006 1.236.719.641 1.325.84 1.513.927.188.087.289.13.332.203.043.072.043.42-.101.825z"/>
                     </svg>
                 </div>
                 <div>
@@ -45,6 +47,22 @@
         </span>
         @endif
     </div>
+
+    <!-- Daemon Status / Error Alert Banner -->
+    <template x-if="errorMessage">
+        <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3 shadow-sm">
+            <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div class="text-xs">
+                <span class="font-bold block text-sm">Status Layanan WhatsApp Daemon:</span>
+                <p class="mt-0.5 leading-relaxed" x-text="errorMessage"></p>
+                <p class="mt-1 text-[11px] text-amber-700">
+                    Host Target: <code class="bg-amber-100 px-1.5 py-0.5 rounded font-mono">{{ config('services.whatsapp.url', env('WHATSAPP_SERVICE_URL', 'http://localhost:3000')) }}</code>
+                </p>
+            </div>
+        </div>
+    </template>
 
     <!-- Top Status Cards Grid -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">

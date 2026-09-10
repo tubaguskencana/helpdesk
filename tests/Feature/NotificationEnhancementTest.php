@@ -224,6 +224,10 @@ class NotificationEnhancementTest extends TestCase
     public function test_whatsapp_message_logging_and_audit(): void
     {
         $waService = app(WhatsAppService::class);
+        $waService->saveSessionData([
+            'status' => WhatsAppService::STATUS_CONNECTED,
+            'account' => '628110000888',
+        ]);
 
         $log = $waService->sendMessage(
             phone: '08123456789',
@@ -237,6 +241,20 @@ class NotificationEnhancementTest extends TestCase
             'phone' => '628123456789',
             'status' => WhatsAppMessage::STATUS_SENT,
         ]);
+    }
+
+    public function test_whatsapp_fails_gracefully_when_disconnected(): void
+    {
+        $waService = app(WhatsAppService::class);
+        $waService->disconnect();
+
+        $log = $waService->sendMessage(
+            phone: '08123456789',
+            message: 'Testing failed delivery',
+            userId: $this->user->id
+        );
+
+        $this->assertEquals(WhatsAppMessage::STATUS_FAILED, $log->status);
     }
 
     public function test_web_push_subscription_endpoints(): void

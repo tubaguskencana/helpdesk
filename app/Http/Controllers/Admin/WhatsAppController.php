@@ -45,7 +45,11 @@ class WhatsAppController extends Controller
             return response()->json($result);
         }
 
-        return back()->with('success', 'WhatsApp connection initiated.');
+        if (($result['status'] ?? '') === WhatsAppService::STATUS_ERROR || !empty($result['error'])) {
+            return back()->with('error', $result['error'] ?? 'Gagal menghubungkan ke WhatsApp service.');
+        }
+
+        return back()->with('success', 'Permintaan sesi WhatsApp berhasil dikirim. Silakan scan QR code.');
     }
 
     public function disconnect(): JsonResponse|RedirectResponse
@@ -56,7 +60,11 @@ class WhatsAppController extends Controller
             return response()->json($result);
         }
 
-        return back()->with('success', 'WhatsApp disconnected successfully.');
+        if (!empty($result['error'])) {
+            return back()->with('error', $result['error']);
+        }
+
+        return back()->with('success', 'WhatsApp berhasil di-disconnect.');
     }
 
     public function testMessage(Request $request): RedirectResponse
