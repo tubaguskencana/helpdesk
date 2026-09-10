@@ -10,6 +10,13 @@
          qrCode: '{{ $status['qr_code'] ?? '' }}',
          errorMessage: '{{ addslashes($status['error'] ?? '') }}',
          loading: false,
+         init() {
+             setInterval(() => {
+                 if (this.connectionStatus !== 'CONNECTED') {
+                     this.refreshStatus();
+                 }
+             }, 2500);
+         },
          refreshStatus() {
              fetch('{{ route('admin.notifications.whatsapp.status') }}')
                  .then(res => res.json())
@@ -18,7 +25,8 @@
                      this.account = data.account || '';
                      this.qrCode = data.qr_code || '';
                      this.errorMessage = data.error || '';
-                 });
+                 })
+                 .catch(() => {});
          }
      }">
 
@@ -162,23 +170,35 @@
     <!-- QR Code Section (Visible when QR code exists or in mock mode) -->
     <template x-if="qrCode">
         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center gap-8">
-            <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-inner shrink-0">
-                <img :src="qrCode" alt="WhatsApp QR Code" class="w-48 h-48 rounded-lg object-contain">
+            <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-inner shrink-0 flex items-center justify-center min-w-[210px] min-h-[210px]">
+                <img :src="qrCode" alt="WhatsApp QR Code" class="w-52 h-52 rounded-lg object-contain">
             </div>
             <div class="space-y-3">
                 <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    Pairing Instructions
+                    Petunjuk Pairing WhatsApp
                 </span>
-                <h3 class="text-base font-bold text-slate-900">Scan QR Code using WhatsApp</h3>
+                <h3 class="text-base font-bold text-slate-900">Scan Barcode untuk Menghubungkan</h3>
                 <ol class="text-xs text-slate-600 space-y-1.5 list-decimal list-inside leading-relaxed">
-                    <li>Open WhatsApp on your mobile phone.</li>
-                    <li>Tap <strong>Settings</strong> (iOS) or <strong>Three Dots Menu</strong> (Android).</li>
-                    <li>Select <strong>Linked Devices</strong> and tap <strong>Link a Device</strong>.</li>
-                    <li>Point your phone camera to this QR code to authenticate session.</li>
+                    <li>Buka aplikasi WhatsApp di smartphone Anda.</li>
+                    <li>Ketuk menu <strong>Perangkat Tertaut (Linked Devices)</strong>.</li>
+                    <li>Ketuk tombol <strong>Tautkan Perangkat (Link a Device)</strong>.</li>
+                    <li>Arahkan kamera HP ke barcode di samping.</li>
                 </ol>
-                <p class="text-[11px] text-slate-400">
-                    Session authentication tokens are stored securely and persistently on the server.
-                </p>
+                <div class="pt-2 flex items-center gap-2 text-xs text-emerald-600 font-medium">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span>Menunggu scan barcode... Sesi akan otomatis terhubung begitu di-scan.</span>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Loading state when QR is being prepared by Baileys -->
+    <template x-if="!qrCode && (connectionStatus === 'CONNECTING' || connectionStatus === 'QR_REQUIRED')">
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+            <div class="w-8 h-8 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin shrink-0"></div>
+            <div>
+                <p class="text-sm font-semibold text-slate-800">Menyiapkan Barcode WhatsApp...</p>
+                <p class="text-xs text-slate-500">Daemon Baileys sedang membuat barcode baru. Barcode akan muncul otomatis dalam beberapa detik.</p>
             </div>
         </div>
     </template>

@@ -20,6 +20,7 @@
     "copyfiles": "^2.4.1",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "qrcode": "^1.5.4",
     "qrcode-terminal": "^0.12.0"
   },
   "devDependencies": {

@@ -39,28 +39,34 @@ class Wenomana {
             if (self.ready) {
                 res.send('WA_IS_READY');
             }
-            else
-                res.send(self.qr);
+            else {
+                res.send(self.qr || '');
+            }
         });
         _ex2.get('/status', function (req, res) {
             res.json({
                 status: self.ready ? 'CONNECTED' : (self.qr ? 'QR_REQUIRED' : 'DISCONNECTED'),
-                account: self.ready ? 'WhatsApp Gateway' : null,
+                account: self.account || (self.ready ? 'WhatsApp Gateway' : null),
                 qr_code: self.qr || null,
                 ready: self.ready
             });
         });
         _ex2.post('/session/start', function (req, res) {
+            if (!self.ready && self.restartSession) {
+                self.restartSession(true);
+            }
             res.json({
-                status: self.ready ? 'CONNECTED' : (self.qr ? 'QR_REQUIRED' : 'DISCONNECTED'),
+                status: self.ready ? 'CONNECTED' : (self.qr ? 'QR_REQUIRED' : 'CONNECTING'),
                 qr_code: self.qr || null,
-                ready: self.ready
+                ready: self.ready,
+                message: 'Permintaan sesi WhatsApp diproses. QR Code sedang dimuat.'
             });
         });
         _ex2.post('/session/disconnect', function (req, res) {
             if (self.logout) self.logout();
             self.ready = false;
             self.qr = undefined;
+            self.account = null;
             res.json({ status: 'DISCONNECTED' });
         });
         _ex2.post('/message/send', function (req, res) {
