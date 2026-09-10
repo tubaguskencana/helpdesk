@@ -11,6 +11,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TicketAttachmentController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TicketReplyController;
+use App\Http\Controllers\WebPushController;
 use Illuminate\Support\Facades\Route;
 
 // Guest Routes
@@ -57,6 +58,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/unread-count', [NotificationController::class, 'unreadCount'])->name('unread-count');
         Route::get('/{notification}/read', [NotificationController::class, 'markAsRead'])->name('read');
         Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
+    });
+
+    // Web Push Subscriptions
+    Route::prefix('web-push')->name('webpush.')->group(function () {
+        Route::post('/subscribe', [WebPushController::class, 'subscribe'])->name('subscribe');
+        Route::post('/unsubscribe', [WebPushController::class, 'unsubscribe'])->name('unsubscribe');
+        Route::get('/key', [WebPushController::class, 'vapidPublicKey'])->name('key');
     });
 
     // Reports (Staff only)

@@ -449,6 +449,18 @@
         </div>
     </div>
 
+    @auth
+    <script>
+        if ('serviceWorker' in navigator && 'PushManager' in window) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').catch(function(err) {
+                    console.debug('Service Worker registration skipped/failed: ', err);
+                });
+            });
+        }
+    </script>
+    @endauth
+
     @stack('scripts')
 </body>
 </html>
