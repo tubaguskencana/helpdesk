@@ -62,6 +62,26 @@ class User extends Authenticatable
         return $this->hasMany(TicketReply::class);
     }
 
+    public function inAppNotifications(): HasMany
+    {
+        return $this->hasMany(Notification::class)->latest();
+    }
+
+    public function unreadInAppNotifications(): HasMany
+    {
+        return $this->hasMany(Notification::class)->unread()->latest();
+    }
+
+    public function pushSubscriptions(): HasMany
+    {
+        return $this->hasMany(WebPushSubscription::class);
+    }
+
+    public function whatsappMessages(): HasMany
+    {
+        return $this->hasMany(WhatsAppMessage::class)->latest();
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === self::ROLE_ADMIN;
